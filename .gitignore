@@ -1,0 +1,26 @@
+# OS specific
+.DS_Store
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+.settings/
+.cproject
+.project
+
+# Build artifacts
+obc/Debug/
+obc/Release/
+node/.pio/
+build/
+*.o
+*.elf
+*.bin
+*.hex
+*.map
+
+# Python virtual environments
+venv/
+__pycache__/
