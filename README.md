@@ -52,17 +52,20 @@ graph TD;
 
 ## 📊 Visual Gallery
 
-*(Insert screenshots and photos of your system in action here)*
+| Hardware Implementation | IDE Configuration |
+| :---: | :---: |
+| <img src="docs/assets/1786648299677.png" alt="Hardware Setup" width="400"/> | <img src="docs/assets/Screenshot%202026-08-13%20185133.png" alt="STM32CubeIDE" width="400"/> |
+| *STM32 Black Pill (Flight PC) and ESP32 (Payload) connected to the host.* | *Bare-metal Cortex-M4 pinout mapping in STM32CubeIDE.* |
 
-| Mission Control Dashboard | Hardware Node Setup |
-| --- | --- |
-|  |  |
-| *Real-time telemetry and AI anomaly alerts via Streamlit.* | *STM32 Black Pill (Flight PC) and ESP32 (Payload).* |
+| Python Ground Data System | Nominal Mission Dashboard |
+| :---: | :---: |
+| <img src="docs/assets/Screenshot%202026-08-13%20185336.png" alt="Terminal Output" width="400"/> | <img src="docs/assets/Screenshot%202026-08-13%20184310.png" alt="Streamlit Nominal" width="400"/> |
+| *Python GDS actively unpacking 17-byte binary telemetry frames.* | *Real-time thermal and attitude telemetry streaming via Streamlit.* |
 
-| Binary Packet Ingestion | FDIR Watchdog Recovery |
-| --- | --- |
-|  |  |
-| *Python GDS unpacking little-endian C-structs.* | *Automated reboot sequence triggered by MPU fault.* |
+| AI Anomaly Detection Triggered |
+| :---: |
+| <img src="docs/assets/Screenshot%202026-08-13%20184512.png" alt="Streamlit Anomaly" width="850"/> |
+| *TinyML Edge AI model successfully catching a simulated 500°C catastrophic sensor failure and triggering an automated alert.* |
 
 ---
 
