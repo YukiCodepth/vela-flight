@@ -38,34 +38,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := obc
+BUILD_ARTIFACT_NAME := flight_software
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-obc.elf \
+flight_software.elf \
 
 MAP_FILES += \
-obc.map \
+flight_software.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-obc.list \
+flight_software.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: obc.elf secondary-outputs
+main-build: flight_software.elf secondary-outputs
 
 # Tool invocations
-obc.elf obc.map: $(OBJS) $(USER_OBJS) C:\Users\amans\OneDrive\Documents\Projects\vela-flight\obc\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "obc.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\amans\OneDrive\Documents\Projects\vela-flight\obc\STM32F401CCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="obc.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+flight_software.elf flight_software.map: $(OBJS) $(USER_OBJS) C:\Users\amans\OneDrive\Documents\Projects\vela-flight\flight_software\STM32F401CCUX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "flight_software.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\amans\OneDrive\Documents\Projects\vela-flight\flight_software\STM32F401CCUX_FLASH.ld" --specs=nosys.specs -Wl,-Map="flight_software.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -74,14 +74,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-obc.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "obc.list"
+flight_software.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "flight_software.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout obc.elf obc.list obc.map
+	-$(RM) default.size.stdout flight_software.elf flight_software.list flight_software.map
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
