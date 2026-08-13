@@ -1,4 +1,4 @@
-# 🛰️ VELA Flight Software (v2.0)
+# 🛰️ VELA Flight Software
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
 [![RTOS](https://img.shields.io/badge/RTOS-FreeRTOS-blue)](#)
