@@ -1,4 +1,3 @@
-```markdown
 # 🛰️ VELA Flight Software (v2.0)
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](#)
