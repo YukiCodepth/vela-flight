@@ -1,0 +1,44 @@
+name: Flight Software CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "phase-*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  static-analysis:
+    name: Cppcheck Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install Cppcheck
+        run: sudo apt-get update && sudo apt-get install -y cppcheck
+
+      - name: Run Static Analysis on Flight Software
+        run: |
+          cppcheck --enable=all --warning-error --inline-suppr \
+          --suppress=missingIncludeSystem \
+          --suppress=unmatchedSuppression \
+          flight_software/Core/Src/
+
+  firmware-syntax-check:
+    name: GCC Syntax Verification
+    runs-on: ubuntu-latest
+    needs: static-analysis
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install ARM Embedded Toolchain
+        run: sudo apt-get update && sudo apt-get install -y gcc-arm-none-eabi
+
+      - name: Check C Syntax
+        run: |
+          arm-none-eabi-gcc -c -mcpu=cortex-m4 -mthumb \
+          -I flight_software/Core/Inc \
+          flight_software/Core/Src/main.c -o /dev/null
