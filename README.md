@@ -1,9 +1,3 @@
-Here is a clean, professional, and highly aesthetic `README.md` designed specifically to catch the eye of engineering leads, aerospace startups, and research labs. It highlights your systems-level thinking, hardware-software integration, and modern tech stack.
-
-Copy the raw text below and paste it directly into your `README.md` file in the root of your GitHub repository.
-
----
-
 ```markdown
 # 🛰️ VELA Flight Software (v2.0)
 
