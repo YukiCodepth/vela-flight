@@ -1,3 +1,5 @@
 .metadata/
 obc/.metadata/
 *.launch
+obc/Debug/
+.metadata/
