@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "protocol.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -43,19 +43,31 @@
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart2;
 
-/* Definitions for BlinkTask */
-osThreadId_t BlinkTaskHandle;
-const osThreadAttr_t BlinkTask_attributes = {
-  .name = "BlinkTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
+/* Definitions for CommsTask */
+osThreadId_t CommsTaskHandle;
+const osThreadAttr_t CommsTask_attributes = {
+  .name = "CommsTask",
+  .stack_size = 256 * 4,
+  .priority = (osPriority_t) osPriorityHigh,
 };
-/* Definitions for UartEchoTask */
-osThreadId_t UartEchoTaskHandle;
-const osThreadAttr_t UartEchoTask_attributes = {
-  .name = "UartEchoTask",
+/* Definitions for TelemetryTask */
+osThreadId_t TelemetryTaskHandle;
+const osThreadAttr_t TelemetryTask_attributes = {
+  .name = "TelemetryTask",
   .stack_size = 256 * 4,
   .priority = (osPriority_t) osPriorityNormal,
+};
+/* Definitions for HousekeepingTas */
+osThreadId_t HousekeepingTasHandle;
+const osThreadAttr_t HousekeepingTas_attributes = {
+  .name = "HousekeepingTas",
+  .stack_size = 128 * 4,
+  .priority = (osPriority_t) osPriorityLow,
+};
+/* Definitions for telemQueue */
+osMessageQueueId_t telemQueueHandle;
+const osMessageQueueAttr_t telemQueue_attributes = {
+  .name = "telemQueue"
 };
 /* USER CODE BEGIN PV */
 
@@ -66,7 +78,8 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 void StartDefaultTask(void *argument);
-void StartTask02(void *argument);
+void StartTask03(void *argument);
+void StartTask04(void *argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -83,7 +96,6 @@ void StartTask02(void *argument);
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -126,16 +138,23 @@ int main(void)
   /* start timers, add new ones, ... */
   /* USER CODE END RTOS_TIMERS */
 
+  /* Create the queue(s) */
+  /* creation of telemQueue */
+  telemQueueHandle = osMessageQueueNew (16, 12, &telemQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* creation of BlinkTask */
-  BlinkTaskHandle = osThreadNew(StartDefaultTask, NULL, &BlinkTask_attributes);
+  /* creation of CommsTask */
+  CommsTaskHandle = osThreadNew(StartDefaultTask, NULL, &CommsTask_attributes);
 
-  /* creation of UartEchoTask */
-  UartEchoTaskHandle = osThreadNew(StartTask02, NULL, &UartEchoTask_attributes);
+  /* creation of TelemetryTask */
+  TelemetryTaskHandle = osThreadNew(StartTask03, NULL, &TelemetryTask_attributes);
+
+  /* creation of HousekeepingTas */
+  HousekeepingTasHandle = osThreadNew(StartTask04, NULL, &HousekeepingTas_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -209,7 +228,6 @@ void SystemClock_Config(void)
   */
 static void MX_USART2_UART_Init(void)
 {
-
   /* USER CODE BEGIN USART2_Init 0 */
 
   /* USER CODE END USART2_Init 0 */
@@ -232,7 +250,6 @@ static void MX_USART2_UART_Init(void)
   /* USER CODE BEGIN USART2_Init 2 */
 
   /* USER CODE END USART2_Init 2 */
-
 }
 
 /**
@@ -273,7 +290,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN Header_StartDefaultTask */
 /**
-  * @brief  Function implementing the BlinkTask thread.
+  * @brief  Function implementing the CommsTask thread.
   * @param  argument: Not used
   * @retval None
   */
@@ -281,43 +298,75 @@ static void MX_GPIO_Init(void)
 void StartDefaultTask(void *argument)
 {
   /* USER CODE BEGIN 5 */
-  /* Infinite loop */
+  uint8_t sync_buf[2];
+  TelemetryFrame rx_frame;
+
   for(;;)
   {
-      // Toggle the blue LED on the Black Pill
-      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+      // 1. Hunt for the Sync Word (0xAA55) byte by byte
+      HAL_UART_Receive(&huart2, &sync_buf[0], 1, HAL_MAX_DELAY);
+      if (sync_buf[0] == 0x55) {
+          HAL_UART_Receive(&huart2, &sync_buf[1], 1, HAL_MAX_DELAY);
+          if (sync_buf[1] == 0xAA) {
 
-      // osDelay puts the task to sleep for 500 ticks, letting other tasks run
-      osDelay(500);
+              // 2. Sync found! Read the rest of the frame (Type, Len, Payload, CRC)
+              // Total size (17) minus the 2 sync bytes = 15 bytes
+              uint8_t *frame_ptr = (uint8_t*)&rx_frame;
+              rx_frame.sync = 0xAA55;
+
+              if (HAL_UART_Receive(&huart2, frame_ptr + 2, 15, 100) == HAL_OK) {
+                  // 3. Push the payload safely to the FreeRTOS Queue
+                  osMessageQueuePut(telemQueueHandle, &rx_frame.payload, 0, osWaitForever);
+              }
+          }
+      }
+      osDelay(1);
   }
   /* USER CODE END 5 */
 }
 
-/* USER CODE BEGIN Header_StartTask02 */
+/* USER CODE BEGIN Header_StartTask03 */
 /**
-* @brief Function implementing the UartEchoTask thread.
+* @brief Function implementing the TelemetryTask thread.
 * @param argument: Not used
 * @retval None
 */
-/* USER CODE END Header_StartTask02 */
-void StartTask02(void *argument)
+/* USER CODE END Header_StartTask03 */
+void StartTask03(void *argument)
 {
-  /* USER CODE BEGIN StartTask02 */
-  uint8_t rx_buffer[1];
+  /* USER CODE BEGIN StartTask03 */
+  TelemetryPayload current_telem;
+
+  for(;;)
+  {
+      // Block indefinitely until data arrives in the queue from the CommsTask
+      if (osMessageQueueGet(telemQueueHandle, &current_telem, NULL, osWaitForever) == osOK) {
+
+          // Data successfully routed via RTOS Queue!
+          // Toggle the LED to verify visually that the data pipeline is flowing
+          HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+      }
+  }
+  /* USER CODE END StartTask03 */
+}
+
+/* USER CODE BEGIN Header_StartTask04 */
+/**
+* @brief Function implementing the HousekeepingTas thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask04 */
+void StartTask04(void *argument)
+{
+  /* USER CODE BEGIN StartTask04 */
   /* Infinite loop */
   for(;;)
   {
-      // Block indefinitely until a byte is received over UART
-      if (HAL_UART_Receive(&huart2, rx_buffer, 1, HAL_MAX_DELAY) == HAL_OK)
-      {
-          // Echo the exact byte back out
-          HAL_UART_Transmit(&huart2, rx_buffer, 1, 100);
-      }
-
-      // Yield execution time to prevent task starvation
-      osDelay(10);
+      // Future FDIR watchdog pings will go here in Phase 3
+      osDelay(1000);
   }
-  /* USER CODE END StartTask02 */
+  /* USER CODE END StartTask04 */
 }
 
 /**
@@ -356,7 +405,8 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-#ifdef USE_FULL_ASSERT
+
+#ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.
@@ -372,4 +422,3 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
-
