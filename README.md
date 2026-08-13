@@ -54,7 +54,7 @@ graph TD;
 
 | Hardware Implementation | IDE Configuration |
 | :---: | :---: |
-| <img src="docs/assets/1786648299677.png" alt="Hardware Setup" width="400"/> | <img src="docs/assets/Screenshot%202026-08-13%20185133_2.png" alt="STM32CubeIDE Pinout" width="400"/> |
+| <img src="docs/assets/1786648299677.png" alt="Hardware Setup" width="400"/> | <img src="docs/assets/ide_pinout.png" alt="STM32CubeIDE Pinout" width="400"/> |
 | *STM32 Black Pill (Flight PC) and ESP32 (Payload) connected to the host.* | *Bare-metal Cortex-M4 pinout mapping in STM32CubeIDE.* |
 
 | Python Ground Data System | Nominal Mission Dashboard |
