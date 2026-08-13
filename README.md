@@ -11,6 +11,25 @@ Designed to demonstrate production-ready aerospace engineering principles for st
 
 ---
 
+## 📊 Visual Gallery
+
+| Hardware Implementation | IDE Configuration |
+| :---: | :---: |
+| <img src="docs/assets/1786648299677.png" alt="Hardware Setup" width="400"/> | <img src="docs/assets/ide_pinout.png" alt="STM32CubeIDE Pinout" width="400"/> |
+| *STM32 Black Pill (Flight PC) and ESP32 (Payload) connected to the host.* | *Bare-metal Cortex-M4 pinout mapping in STM32CubeIDE.* |
+
+| Python Ground Data System | Nominal Mission Dashboard |
+| :---: | :---: |
+| <img src="docs/assets/Screenshot%202026-08-13%20185336.png" alt="Terminal Output" width="400"/> | <img src="docs/assets/Screenshot%202026-08-13%20184310.png" alt="Streamlit Nominal" width="400"/> |
+| *Python GDS actively unpacking 17-byte binary telemetry frames.* | *Real-time thermal and attitude telemetry streaming via Streamlit.* |
+
+| AI Anomaly Detection Triggered |
+| :---: |
+| <img src="docs/assets/Screenshot%202026-08-13%20184512.png" alt="Streamlit Anomaly" width="850"/> |
+| *TinyML Edge AI model successfully catching a simulated 500°C catastrophic sensor failure and triggering an automated alert.* |
+
+---
+
 ## ⚙️ System Architecture & Data Flow
 
 The system operates across two independent microcontrollers and a host machine, connected via UART and synchronized through a preemptive real-time operating system.
@@ -47,25 +66,6 @@ graph TD;
 * **Edge AI (TinyML):** A bare-metal statistical anomaly detection model trained on historical telemetry. The AI continuously calculates Z-scores on live data streams, triggering hardware visual alarms if sensors deviate beyond a 3-sigma operational envelope.
 * **Automated Data Dictionary:** NASA JPL-style YAML-to-C code generation (`dict_generator.py`) ensures zero mismatch between the flight computer's C-structs and the Python unpacking logic.
 * **Live Mission Dashboard:** A real-time `Streamlit` web interface that ingests serial CSV logs to visualize thermal walks, radiation metrics, and orbital attitude dynamics.
-
----
-
-## 📊 Visual Gallery
-
-| Hardware Implementation | IDE Configuration |
-| :---: | :---: |
-| <img src="docs/assets/1786648299677.png" alt="Hardware Setup" width="400"/> | <img src="docs/assets/ide_pinout.png" alt="STM32CubeIDE Pinout" width="400"/> |
-| *STM32 Black Pill (Flight PC) and ESP32 (Payload) connected to the host.* | *Bare-metal Cortex-M4 pinout mapping in STM32CubeIDE.* |
-
-| Python Ground Data System | Nominal Mission Dashboard |
-| :---: | :---: |
-| <img src="docs/assets/Screenshot%202026-08-13%20185336.png" alt="Terminal Output" width="400"/> | <img src="docs/assets/Screenshot%202026-08-13%20184310.png" alt="Streamlit Nominal" width="400"/> |
-| *Python GDS actively unpacking 17-byte binary telemetry frames.* | *Real-time thermal and attitude telemetry streaming via Streamlit.* |
-
-| AI Anomaly Detection Triggered |
-| :---: |
-| <img src="docs/assets/Screenshot%202026-08-13%20184512.png" alt="Streamlit Anomaly" width="850"/> |
-| *TinyML Edge AI model successfully catching a simulated 500°C catastrophic sensor failure and triggering an automated alert.* |
 
 ---
 
