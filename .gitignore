@@ -1,22 +1,3 @@
-# OS specific
-Thumbs.db
-Desktop.ini
-
-# IDEs and Editors
-.vscode/
-.idea/
-*.swp
-.settings/
-.cproject
-.project
-
-# Build artifacts
-obc/Debug/
-obc/Release/
-node/.pio/
-build/
-*.o
-*.elf
-*.bin
-*.hex
-*.map
+.metadata/
+obc/.metadata/
+*.launch
