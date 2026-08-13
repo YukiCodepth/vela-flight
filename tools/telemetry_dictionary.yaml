@@ -1,0 +1,17 @@
+mission: "VELA-1"
+version: "2.0"
+sync_word: "0xAA55"
+
+telemetry_fields:
+  - name: "temperature"
+    type: "float"
+    size: 4
+    description: "Core thermal sensor reading in Celsius"
+  - name: "radiation"
+    type: "uint32_t"
+    size: 4
+    description: "Cumulative cosmic radiation particle hits"
+  - name: "attitude"
+    type: "float"
+    size: 4
+    description: "Spacecraft attitude angle in radians"
